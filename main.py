@@ -9,48 +9,48 @@ def validar_email(email):
 #INSERINDO ALUNO
 def inserindo_aluno(cursor, conn):
     while True:            
-            nome = input("Digite o nome do aluno: ").title().strip()
-            #VALIDANDO EMAIL
+        nome = input("Digite o nome do aluno: ").title().strip()
+        #VALIDANDO EMAIL
+        while True:
+            email = input("Digite o email do aluno: ")
+            if not validar_email(email):
+                print("Email invalido. Digite novamente.")
+                continue
+            cursor.execute("SELECT * FROM alunos WHERE email =?", (email,))
+            if cursor.fetchone():
+                print("Este e-mail já está cadastrado. Digite outro.")
+                continue
+            break                                                
+        turma = input("Qual a turma do aluno: ").strip().title()
+        notas = []
+        for i in range(1, 4):
             while True:
-                email = input("Digite o email do aluno: ")
-                if not validar_email(email):
-                    print("Email invalido. Digite novamente.")
-                    continue
-                cursor.execute("SELECT * FROM alunos WHERE email =?", (email,))
-                if cursor.fetchone():
-                    print("Este e-mail já está cadastrado. Digite outro.")
-                    continue
-                break                                                
-                        
-            notas = []
-            for i in range(1, 4):
-                while True:
-                    try:
-                        nota = float(input(f"Digite a nota {i} (0 a 10): "))
-                        if 0 <= nota <= 10:
-                            notas.append(nota)
-                            break
-                        else:
-                            print("A nota deve ser um inteiro entre 0 e 10.")
+                try:
+                    nota = float(input(f"Digite a nota {i} (0 a 10): "))
+                    if 0 <= nota <= 10:
+                        notas.append(nota)
+                        break
+                    else:
+                        print("A nota deve ser um inteiro entre 0 e 10.")
                                 
-                    except ValueError:
-                        print("Digite um número valido.")
+                except ValueError:
+                    print("Digite um número valido.")
                             
-            notas_str = ",".join(map(str, notas))
-            cursor.execute("INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)", (nome, email, notas_str))
-            conn.commit()
-            print(f"\nAluno {nome} inserido com sucesso!")
+        notas_str = ",".join(map(str, notas))
+        cursor.execute("INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)", (nome, email, turma, notas_str))
+        conn.commit()
+        print(f"\nAluno {nome} inserido com sucesso!")
 
-            continuar = input("Deseja adicionar outro aluno? (s/n)").lower()
-                f continuar != 's':
-                break
+        continuar = input("Deseja adicionar outro aluno? (s/n)").lower()
+        if continuar != 's':
+            break
         
 #EXIBINDO DADOS
 def exibindo_lista(cursor):       
     cursor.execute("SELECT * FROM alunos") 
     aluno = cursor.fetchall()
-    for id, nome, email, notas in aluno:
-        print(f"Aluno {id}:\n{nome}; \n{email}; \nNotas: {notas};\n")
+    for id, nome, email, turma, notas in aluno:
+        print(f"Aluno {id}:\n{nome}; \n{email}; \nTurma: {turma} \nNotas: {notas};\n")
 
 def exibir_aluno(cursor):
     nome = input("Digite o nome do aluno que deseja buscar: ").title().strip()
@@ -70,16 +70,19 @@ def alterando_aluno(cursor, conn):
     aluno = cursor.fetchone()
 
     if aluno:
-        print(f"Aluno encontrado: \nID = {aluno[0]}; Nome = {aluno[1]}; Email = {aluno[2]}; Notas = {aluno[3]}")
+        print(f"Aluno encontrado: \nID: {aluno[0]}; Nome: {aluno[1]}; Email: {aluno[2]}; Turma: {aluno[3]}; Notas: {aluno[4]}")
         novo_nome = input("Digite o novo nome do aluno (pressione enter para manter nome atual): ").strip().title()
+        
         #validando novo email             
         novo_email = input("Digite o novo email do aluno (pressione enter para manter nome atual): ").strip()
-            
         if not novo_email:
             novo_email = aluno[2]
         elif not validar_email(novo_email):
             print("Email invalido. Operação cancelada.")
             return
+        
+        nova_turma = input("Qual a turma do aluno: ").strip().title()
+        
         notas = []
         for i in range(1, 4):
             entrada = input(f"Digite a nota {i} (0 a 10) ou pressione enter para manter: ").strip()
@@ -98,11 +101,12 @@ def alterando_aluno(cursor, conn):
         #MANTER DADOS ANTIGOS SE USUSARIO DESEJAR:
         nome_final = novo_nome if novo_nome else aluno[1]
         email_final = novo_email if novo_email else aluno[2]
-        notas_final = ",".join(map(str, notas)) if notas else aluno[3]
+        turma_final = nova_turma if nova_turma else aluno[3]
+        notas_final = ",".join(map(str, notas)) if notas else aluno[4]
 
         cursor.execute("""
-            UPDATE alunos SET nome = ?, email = ?, notas = ?
-            WHERE email = ? """, (nome_final, email_final, notas_final, email))
+            UPDATE alunos SET nome = ?, email = ?, turma = ?, notas = ?
+            WHERE email = ? """, (nome_final, email_final, turma_final, notas_final, email))
         conn.commit()                                    
         print("\nAtualizando...")
         print("Dados atualizados com sucesso!")
@@ -158,7 +162,7 @@ def media_notas(cursor):
         print(f"{nome:<20}{media: >5.1f}")    
 
 
-with sqlite3.connect(":memory:") as conn:
+with sqlite3.connect("cadastroAluno.db") as conn:
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -166,34 +170,35 @@ with sqlite3.connect(":memory:") as conn:
             id    INTEGER PRIMARY KEY AUTOINCREMENT,
             nome  VARCHAR(100) NOT NULL,
             email VARCHAR(100) NOT NULL,
+            turma TEXT NOT NULL,
             notas TEXT NOT NULL
         )
     """)
     
     #INSERINDO DADOS
     cursor.execute(
-        "INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)",
-        ("João", "joao@email.com", "8,5,10")
+        "INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)",
+        ("João", "joao@email.com", "A1", "8,5,10")
     )
     cursor.execute(
-        "INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)",
-        ("Maria", "maria@email.com", "1,10,10")
+        "INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)",
+        ("Maria", "maria@email.com", "B1", "1,10,10")
     )
     cursor.execute(
-        "INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)",
-        ("Jose", "jose@email.com", "8.1,5.9,10")
+        "INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)",
+        ("Jose", "jose@email.com", "C1", "8.1,5.9,10")
     )
     cursor.execute(
-        "INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)",
-        ("Ana", "ana@email.com", "7.7,7.5,10")
+        "INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)",
+        ("Ana", "ana@email.com", "A1", "7.7,7.5,10")
     )
     cursor.execute(
-        "INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)",
-        ("Teste", "teste@email.com", "2,2,2")
+        "INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)",
+        ("Teste", "teste@email.com", "B1", "2,2,2")
     )
     cursor.execute(
-        "INSERT INTO alunos (nome, email, notas) VALUES (?, ?, ?)",
-        ("Teste2", "teste2@email.com", "5,5,5")
+        "INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)",
+        ("Teste2", "teste2@email.com", "C1", "5,5,5")
     )
 
 
@@ -234,7 +239,7 @@ def main(cursor, conn):
                     print("-" * 26)
                 elif escolha == 6:
                     print("\nBuscar aluno")
-                    exibir_aluno(cursor, conn)
+                    exibir_aluno(cursor)
                     print("-" * 26)
                 elif escolha == 7:
                     print("\nEncerrrando programa....")
@@ -250,4 +255,4 @@ def main(cursor, conn):
             print("\nEncerrrando programa....")
             break
                 
-main()
+main(cursor, conn)
