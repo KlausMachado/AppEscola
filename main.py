@@ -1,10 +1,10 @@
 import sqlite3
-from database import criar_tabela, inserir_alunos_iniciais
+from database import criar_tabela, inserir_dados_iniciais
 from crud import(
     inserindo_aluno,
     alterando_aluno,
     deletar_aluno,
-    listar_aluno,
+    listar_alunos,
     buscar_aluno_por_nome,
     buscar_por_turma
     )
