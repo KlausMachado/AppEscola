@@ -8,7 +8,7 @@ from crud import(
     buscar_aluno_por_nome,
     buscar_por_turma
     )
-from relatorios import calcular_media_notas    
+from relatorios import calcular_media_notas, exportar_relatorio_csv
 
 #MENU:
 def menu(cursor, conn):
@@ -21,7 +21,8 @@ def menu(cursor, conn):
         print("5- Calcular média dos alunos")
         print("6- Buscar aluno")
         print("7- Burcar turma")
-        print("8- SAIR")
+        print("8- Exportar relatório para CSV")
+        print("9- SAIR")
         print("-" * 30)
         try:
             escolha = int(input("\nQual ação deseja realizar? "))
@@ -55,6 +56,9 @@ def menu(cursor, conn):
                     buscar_por_turma(cursor)
                     print("-" * 26)
                 elif escolha == 8:
+                    print("\nExportando relatório para CSV:")
+                    exportar_relatorio_csv(cursor)
+                elif escolha == 9:    
                     print("\nEncerrrando programa....")
                     break
             else:

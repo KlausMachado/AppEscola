@@ -1,3 +1,4 @@
+import pandas as pd
 from utils import media_notas
 #ANALIZANDO DADOS
 def calcular_media_notas(cursor):    
@@ -51,6 +52,15 @@ def calcular_media_notas(cursor):
     print(f"Turma com mais aprovados: {turma_mais_aprovados[0]} ({turma_mais_aprovados[1]['aprovados']} alunos)")
     print(f"Turma com mais em recuperação: {turma_mais_recuperacao[0]} ({turma_mais_recuperacao[1]['recuperacao']} alunos)")
     print(f"Turma com mais reprovados: {turma_mais_reprovados[0]} ({turma_mais_reprovados[1]['reprovados']} alunos)")
-    print("-" * 30)        
+    print("-" * 30)
 
+def exportar_relatorio_csv(cursor, nome_arquivo='relatorio_alunos.csv'):
+    cursor.execute("SELECT nome, email, turma, notas FROM alunos")
+    dados = cursor.fetchall()
+
+    colunas = ['Nome', 'Email', 'Turma', 'Notas']
+    df = pd.DataFrame(dados, columns=colunas)
+
+    df.to_csv(nome_arquivo, index=False, encoding='utf-8-sig')
+    print(f"Relatório exportado para: {nome_arquivo}")
       
