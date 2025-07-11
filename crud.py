@@ -1,4 +1,4 @@
-from utils import validar_email, validar_nota, media_notas
+from validacoes import validar_email, validar_nota
 
 #FUNÇÕES CRUD:
 #INSERINDO ALUNO
