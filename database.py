@@ -2,7 +2,7 @@ import sqlite3
 def conectar_banco(nome_banco="cadastroAluno.db"):
     return sqlite3.connect(nome_banco)
     
-def criar_tabela(cursor):
+def criar_tabela_alunos(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS alunos (
             id    INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,14 +13,12 @@ def criar_tabela(cursor):
         )
     """)
 
-def inserir_dados_iniciais(cursor):
+def inserir_dados_teste_alunos(cursor):
     dados = [
-        ("João", "joao@email.com", "A1", "8,5,10"),
-        ("Maria", "maria@email.com", "B1", "1,10,10"),
-        ("Jose", "jose@email.com", "C1", "8.1,5.9,10"),
-        ("Ana", "ana@email.com", "A1", "7.7,7.5,10"),
-        ("Teste", "teste@email.com", "B1", "2,2,2"),
-        ("Teste2", "teste2@email.com", "C1", "5,5,5")
+        ("Teste 1", "teste1@email.com", "A1", "8,5,10"),
+        ("Teste 2", "teste2@email.com", "B1", "1,10,10"),
+        ("Teste 3", "teste3@email.com", "B1", "2,2,2"),
+        ("Teste4", "teste4@email.com", "C1", "5,5,5")
     ]
     for aluno in dados:
         try:
