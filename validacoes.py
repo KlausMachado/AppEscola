@@ -1,4 +1,6 @@
 import re
+import hashlib as hash
+
 def validar_email(email):
     padrao = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     return re.match(padrao, email)
@@ -18,3 +20,7 @@ def media_notas(notas_str):
     notas = list(map(float, notas_str.split(",")))
     media = sum(notas) / len(notas)
     return media
+
+#transformando a senha em hexadecimal    
+def gerar_hash_senha(senha):
+    return hash.sha256(senha.encode()).hexdigest()
