@@ -1,5 +1,5 @@
 import sqlite3
-from validacoes import validar_email
+from validacoes import validar_email, gerar_hash_senha
 
 
 with sqlite3.connect("usuarios.db") as conn:
@@ -33,15 +33,17 @@ with sqlite3.connect("usuarios.db") as conn:
                 continue
             break
         senha = input("Senha: ").strip()
-        cursor.execute("INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)", (nome, email, senha))
+        senha_hash = gerar_hash_senha(senha)
+        cursor.execute("INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)", (nome, email, senha_hash))
         conn.commit()
         print(f"\nUsuario {nome} inserido com sucesso!")
     
     def login_usuario():
         email = input("Email: ").strip()
         senha = input("Senha: ").strip()
+        senha_hash = gerar_hash_senha(senha)
             
-        cursor.execute("SELECT nome FROM usuarios WHERE email=? AND senha=?", (email, senha))
+        cursor.execute("SELECT nome FROM usuarios WHERE email=? AND senha=?", (email, senha_hash))
         resultado = cursor.fetchone()
 
         if resultado:
@@ -55,10 +57,10 @@ with sqlite3.connect("usuarios.db") as conn:
 #------dados de teste usuario-------
     def inserir_dados_teste_usuarios():
         dados = [
-            ("Usuario 1", "usuario1@email.com", "123"),
-            ("Usuario 2", "usuario2@email.com", "123"),
-            ("Usuario 3", "usuario3@email.com", "123"),
-            ("Usuario 4", "usuario4@email.com", "123")
+            ("Usuario 1", "usuario1@email.com", gerar_hash_senha("123")),
+            ("Usuario 2", "usuario2@email.com", gerar_hash_senha("123")),
+            ("Usuario 3", "usuario3@email.com", gerar_hash_senha("123")),
+            ("Usuario 4", "usuario4@email.com", gerar_hash_senha("123"))
         ]
         for usuario in dados:
             try:
