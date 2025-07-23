@@ -8,7 +8,7 @@ from crud import(
     buscar_aluno_por_nome,
     buscar_por_turma
     )
-from relatorios import calcular_media_notas 
+from relatorios import calcular_media_notas, exportar_relatorio_para_csv
 from login import (
     cadastrar_usuario, 
     login_usuario, 
@@ -42,7 +42,7 @@ def autenticar_usuario():
                     return False
             else:
                 print("opção invalida")
-        
+
         except ValueError:
             print("\nA opção deve ser um numero.")
             print("Tente novamente")
@@ -59,7 +59,7 @@ def menu(cursor, conn):
         print("5- Calcular média dos alunos")
         print("6- Buscar aluno")
         print("7- Burcar turma")
-        #print("8- Exportar relatorio geral em CSV")
+        print("8- Exportar relatorio geral em CSV")
         print("9- SAIR")
         print("-" * 30)
         try:
@@ -93,21 +93,20 @@ def menu(cursor, conn):
                     print("\nBuscar turma")
                     buscar_por_turma(cursor)
                     print("-" * 26)
-                elif escolha == 9:
-                    print("\nEncerrrando programa....")
-                    break
-                
-                '''elif escolha == 8:
+                elif escolha == 8:
                     print("Exportando relatorio...")
                     exportar_relatorio_para_csv(cursor)
-                    print("-" * 26)'''
-                    
+                    print("-" * 26)
+                elif escolha == 9:
+                    print("\nEncerrrando programa....")
+                    break               
+
             else:
                 print("Opção invalida.")
         except ValueError:
                 print("\nA escolha deve ser um numero.")
                 print("Tente novamente.")
-                
+
 
         continuar = input("\nDeseja realizar outra ação? (s/n)").lower()
         if continuar != 's':
