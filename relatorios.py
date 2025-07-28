@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 #import numpy
 from validacoes import media_notas 
 #ANALIZANDO DADOS
@@ -60,6 +62,25 @@ def calcular_media_notas(cursor):
     print(f"Turma com mais reprovados: {turma_mais_reprovados[0]} ({turma_mais_reprovados[1]['reprovados']} alunos)")
     print("-" * 35)
 
+    #gerando grafico de desempenho
+    situacoes = ['Aprovados', 'Recuperacao', 'Reprovados']
+    quantidades = [len(aprovados), len(recuperacao), len(reprovados)]
+    cores = ['green', 'orange', 'red']
+
+    #configurando grafico
+    plt.figure(figsize=(8, 5))
+    plt.bar(situacoes, quantidades, color=cores)
+    plt.title('Desempenho dos alunos')
+    plt.xlabel('Situacao')
+    plt.ylabel('Quantidade de alunos')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+    #formatando eixo y
+    plt.gca().yaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    plt.tight_layout() #ajusta o layout para evitar corte de labels
+    
+    #exibindo grafico
+    plt.show()
    
 #TRANSFORMANDO EM CSV
 def exportar_relatorio_para_csv(cursor, nome_arquivo="relatorio_alunos.csv"):
