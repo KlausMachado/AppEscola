@@ -1,4 +1,4 @@
-from validacoes import validar_email, validar_nota
+from validacoes import validar_email, validar_nota, media_notas
 
 #FUNÇÕES CRUD:
 #INSERINDO ALUNO
@@ -25,7 +25,7 @@ def inserindo_aluno(cursor, conn):
                 if nota is not None:
                     notas.append(nota)
                     break
-                            
+
         notas_str = ",".join(map(str, notas))
         cursor.execute("INSERT INTO alunos (nome, email, turma, notas) VALUES (?, ?, ?, ?)", (nome, email, turma, notas_str))
         conn.commit()
@@ -34,7 +34,7 @@ def inserindo_aluno(cursor, conn):
         continuar = input("Deseja adicionar outro aluno? (s/n)").lower()
         if continuar != 's':
             break
-        
+
 #EXIBINDO DADOS
 def listar_alunos(cursor):       
     cursor.execute("SELECT * FROM alunos") 
@@ -51,7 +51,7 @@ def buscar_aluno_por_nome(cursor):
         print(f"\n{resultado[0]} - Notas: {resultado[2]} | Média: {media:.1f} | Turma: {resultado[1]}") 
     else:
         print("Aluno não encontrado")
-        
+
 def buscar_por_turma(cursor):
     turma = input("Qual turma deseja buscar? ").title().strip()
     cursor.execute("SELECT * FROM alunos WHERE turma=?", (turma,))
@@ -72,7 +72,7 @@ def alterando_aluno(cursor, conn):
     if aluno:
         print(f"Aluno encontrado: \nID: {aluno[0]}; Nome: {aluno[1]}; Email: {aluno[2]}; Turma: {aluno[3]}; Notas: {aluno[4]}")
         novo_nome = input("Digite o novo nome do aluno (pressione enter para manter nome atual): ").strip().title()
-        
+
         #validando novo email             
         novo_email = input("Digite o novo email do aluno (pressione enter para manter nome atual): ").strip()
         if not novo_email:
@@ -80,9 +80,9 @@ def alterando_aluno(cursor, conn):
         elif not validar_email(novo_email):
             print("Email invalido. Operação cancelada.")
             return
-        
+
         nova_turma = input("Digite a nova turma do aluno (pressione enter para manter nome atual): ").strip().title()
-        
+
         notas_antigas = list(map(float, aluno[4].split(",")))
         notas = []
         for i in range(3):
@@ -97,7 +97,7 @@ def alterando_aluno(cursor, conn):
                     break
                 else:
                     print("Nota inválida. Tente novamente.")
-                
+
         #MANTER DADOS ANTIGOS SE USUSARIO DESEJAR:
         nome_final = novo_nome if novo_nome else aluno[1]
         email_final = novo_email if novo_email else aluno[2]
@@ -112,7 +112,7 @@ def alterando_aluno(cursor, conn):
         print("Dados atualizados com sucesso!")
     else:
         print("Aluno não encontrado")
-        
+
 #DELETANDO        
 def deletar_aluno(cursor, conn):
     nome = input("Digite o nome do aluno: ").title().strip()
